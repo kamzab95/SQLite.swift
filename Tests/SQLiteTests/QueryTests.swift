@@ -262,7 +262,9 @@ class QueryTests : XCTestCase {
         let value1 = TestCodable(int: 1, string: "2", bool: true, float: 3, double: 4, optional: nil, sub: nil)
         let value = TestCodable(int: 1, string: "2", bool: true, float: 3, double: 4, optional: "optional", sub: value1)
         let insert = try emails.insert(value)
-        let encodedJSON = try JSONEncoder().encode(value1)
+        let encodedJSON = try autoreleasepool {
+            try JSONEncoder().encode(value1)
+        }
         let encodedJSONString = String(data: encodedJSON, encoding: .utf8)!
         AssertSQL(
             "INSERT INTO \"emails\" (\"int\", \"string\", \"bool\", \"float\", \"double\", \"optional\", \"sub\") VALUES (1, '2', 1, 3.0, 4.0, 'optional', '\(encodedJSONString)')",
@@ -299,7 +301,9 @@ class QueryTests : XCTestCase {
         let value1 = TestCodable(int: 1, string: "2", bool: true, float: 3, double: 4, optional: nil, sub: nil)
         let value = TestCodable(int: 1, string: "2", bool: true, float: 3, double: 4, optional: nil, sub: value1)
         let update = try emails.update(value)
-        let encodedJSON = try JSONEncoder().encode(value1)
+        let encodedJSON = try autoreleasepool {
+            try JSONEncoder().encode(value1)
+        }
         let encodedJSONString = String(data: encodedJSON, encoding: .utf8)!
         AssertSQL(
             "UPDATE \"emails\" SET \"int\" = 1, \"string\" = '2', \"bool\" = 1, \"float\" = 3.0, \"double\" = 4.0, \"sub\" = '\(encodedJSONString)'",

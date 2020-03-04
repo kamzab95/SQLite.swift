@@ -133,7 +133,9 @@ fileprivate class SQLiteEncoder: Encoder {
                 self.encoder.setters.append(Expression(key.stringValue) <- data)
             }
             else {
-                let encoded = try JSONEncoder().encode(value)
+                let encoded = try autoreleasepool {
+                    try JSONEncoder().encode(value)
+                }
                 let string = String(data: encoded, encoding: .utf8)
                 self.encoder.setters.append(Expression(key.stringValue) <- string)
             }
@@ -296,7 +298,9 @@ fileprivate class SQLiteDecoder : Decoder {
             guard let data = JSONString.data(using: .utf8) else {
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "invalid utf8 data found"))
             }
-            return try JSONDecoder().decode(type, from: data)
+            return try autoreleasepool {
+                try JSONDecoder().decode(type, from: data)
+            }
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
